@@ -16,7 +16,7 @@ import { SCORING_DATA } from "../constants/ScroingData";
 type Language = "en" | "et" | "ru";
 
 const Questionnaire: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState<Language>("en");
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: any;
@@ -86,7 +86,7 @@ const Questionnaire: React.FC = () => {
             {item[selectedLanguage]?.options ? (
               <>
                 <FormLabel component="legend">
-                  {t(item[selectedLanguage].question)}
+                  {item[selectedLanguage]?.question}
                 </FormLabel>
                 <RadioGroup name="education">
                   {(item[selectedLanguage]?.options || []).map(
@@ -110,7 +110,7 @@ const Questionnaire: React.FC = () => {
             ) : (
               <>
                 <FormLabel component="legend">
-                  {t(item[selectedLanguage].question)}
+                  {item[selectedLanguage]?.question}
                 </FormLabel>
                 {item[selectedLanguage]?.pairs?.map((pair) => (
                   <Card
