@@ -12,28 +12,27 @@ import {
 } from "@mui/material";
 import { DUMMY_QUESTIONS } from "../constants/DummyQuestions";
 import { SCORING_DATA } from "../constants/ScroingData";
-import ReactGA from 'react-ga4';
+import ReactGA from "react-ga4";
 
 type Language = "en" | "et" | "ru";
 
 const Questionnaire: React.FC = () => {
   const { i18n } = useTranslation();
+  const [showReport, setShowReport] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>("en");
+  const [recomendation, setRecomendation] = useState<any>(null);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: any;
   }>({});
 
-
-const onQuestionnaireComplete = () => {
-  ReactGA.event({
-    category: 'Questionnaire',
-    action: 'Complete',
-    label: 'Questionnaire Completion',
-    value: 1
-  });
-
-  console.log('Questionnaire completed!');
-};
+  const onQuestionnaireComplete = () => {
+    ReactGA.event({
+      category: "Questionnaire",
+      action: "Complete",
+      label: "Questionnaire Completion",
+      value: 1,
+    });
+  };
 
   const handleSelect = (id: string, choice: string) => {
     setSelectedOptions((prev) => ({ ...prev, [id]: choice }));
@@ -64,21 +63,9 @@ const onQuestionnaireComplete = () => {
       });
     });
 
-    let maxKey: any = null;
-    let maxValue = -Infinity;
-
-    for (const key in userScores) {
-      if (userScores[key] > maxValue) {
-        maxKey = key;
-        maxValue = userScores[key];
-      }
-    }
-
-    const highestScoreCareer: any = SCORING_DATA.careerPaths.find(
-      (item) => item.id === maxKey
-    );
-
-    console.log(highestScoreCareer[selectedLanguage]);
+    console.log(userScores);
+    setRecomendation(userScores);
+    setShowReport(true);
   };
 
   useEffect(() => {
@@ -89,90 +76,123 @@ const onQuestionnaireComplete = () => {
 
   return (
     <div className="p-4 max-w-md mx-auto">
-      <FormControl component="fieldset">
-        {DUMMY_QUESTIONS.map((item) => (
-          <div key={item.id}>
-            {item[selectedLanguage]?.options ? (
-              <>
-                <FormLabel component="legend">
-                  {item[selectedLanguage]?.question}
-                </FormLabel>
-                <RadioGroup name="education">
-                  {(item[selectedLanguage]?.options || []).map(
-                    (option: string, index: number) => (
-                      <FormControlLabel
-                        key={index}
-                        value={option}
-                        control={<Radio />}
-                        label={option}
-                        onChange={(e) =>
-                          handleSelect(
-                            item.id,
-                            (e.target as HTMLInputElement).value
-                          )
-                        }
-                      />
-                    )
-                  )}
-                </RadioGroup>
-              </>
-            ) : (
-              <>
-                <FormLabel component="legend">
-                  {item[selectedLanguage]?.question}
-                </FormLabel>
-                {item[selectedLanguage]?.pairs?.map((pair) => (
-                  <Card
-                    key={pair.id}
-                    className="mb-4 p-4 w-full max-w-md gap-2"
-                  >
-                    <Typography>
-                      {pair.a} vs {pair.b}
-                    </Typography>
-                    <div className="flex justify-around mt-4 gap-2">
-                      <Button
-                        variant={
-                          selectedOptions?.[item.id]?.[pair.id] === "a"
-                            ? "contained"
-                            : "outlined"
-                        }
-                        onClick={() =>
-                          handleSelect(item.id, {
-                            ...selectedOptions[item.id],
-                            [pair.id]: "a",
-                          })
-                        }
-                      >
-                        {pair.a}
-                      </Button>
-                      <Button
-                        variant={
-                          selectedOptions?.[item.id]?.[pair.id] === "b"
-                            ? "contained"
-                            : "outlined"
-                        }
-                        onClick={() =>
-                          handleSelect(item.id, {
-                            ...selectedOptions[item.id],
-                            [pair.id]: "b",
-                          })
-                        }
-                      >
-                        {pair.b}
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </>
-            )}
+      {showReport ? (
+        <div className="flex flex-col gap-4 justify-center items-center w-[400px]">
+          <div className="p-4 bg-slate-200">
+            <Typography variant="h6">Recomended Career Paths:</Typography>
+
+            {Object.keys(recomendation)?.map((item: any, index: number) => (
+              <Typography key={item}>
+                {index + 1}.{" "}
+                {
+                  SCORING_DATA.careerPaths.find((cp) => cp.id === item)?.[
+                    selectedLanguage
+                  ]
+                }
+              </Typography>
+            ))}
           </div>
-        ))}
-      </FormControl>
-      <div className="mt-4 flex items-center justify-center">
-        <Button variant="contained" color="primary" onClick={calculateScore}>
-          Submit
-        </Button>
-      </div>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setShowReport(false)}
+          >
+            Back
+          </Button>
+        </div>
+      ) : (
+        <>
+          <FormControl component="fieldset">
+            {DUMMY_QUESTIONS.map((item) => (
+              <div key={item.id}>
+                {item[selectedLanguage]?.options ? (
+                  <>
+                    <FormLabel component="legend">
+                      {item[selectedLanguage]?.question}
+                    </FormLabel>
+                    <RadioGroup name="education">
+                      {(item[selectedLanguage]?.options || []).map(
+                        (option: string, index: number) => (
+                          <FormControlLabel
+                            key={index}
+                            value={option}
+                            control={<Radio />}
+                            label={option}
+                            onChange={(e) =>
+                              handleSelect(
+                                item.id,
+                                (e.target as HTMLInputElement).value
+                              )
+                            }
+                          />
+                        )
+                      )}
+                    </RadioGroup>
+                  </>
+                ) : (
+                  <>
+                    <FormLabel component="legend">
+                      {item[selectedLanguage]?.question}
+                    </FormLabel>
+                    {item[selectedLanguage]?.pairs?.map((pair) => (
+                      <Card
+                        key={pair.id}
+                        className="mb-4 p-4 w-full max-w-md gap-2"
+                      >
+                        <Typography>
+                          {pair.a} vs {pair.b}
+                        </Typography>
+                        <div className="flex justify-around mt-4 gap-2">
+                          <Button
+                            variant={
+                              selectedOptions?.[item.id]?.[pair.id] === "a"
+                                ? "contained"
+                                : "outlined"
+                            }
+                            onClick={() =>
+                              handleSelect(item.id, {
+                                ...selectedOptions[item.id],
+                                [pair.id]: "a",
+                              })
+                            }
+                          >
+                            {pair.a}
+                          </Button>
+                          <Button
+                            variant={
+                              selectedOptions?.[item.id]?.[pair.id] === "b"
+                                ? "contained"
+                                : "outlined"
+                            }
+                            onClick={() =>
+                              handleSelect(item.id, {
+                                ...selectedOptions[item.id],
+                                [pair.id]: "b",
+                              })
+                            }
+                          >
+                            {pair.b}
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                  </>
+                )}
+              </div>
+            ))}
+          </FormControl>
+          <div className="mt-4 flex items-center justify-center">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={calculateScore}
+            >
+              Submit
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
