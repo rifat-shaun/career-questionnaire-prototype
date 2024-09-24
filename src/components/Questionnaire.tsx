@@ -41,13 +41,6 @@ const Questionnaire: React.FC = () => {
     return scores;
   };
 
-  function sortObjectByValues<T extends Record<string, number>>(obj: T): T {
-    const sortable: [string, number][] = Object.entries(obj);
-    sortable.sort(([, a], [, b]) => b - a);
-    const sortedObj: T = Object.fromEntries(sortable) as T;
-    return sortedObj;
-  }
-
   const calculateScore = () => {
     const scores = getScores(SCORING_DATA.scoring, selectedOptions);
     const userScores: any = {};
@@ -75,7 +68,9 @@ const Questionnaire: React.FC = () => {
   };
 
   useEffect(() => {
-    setSelectedLanguage((i18n?.language as Language) || "en");
+    if (i18n?.language) {
+      setSelectedLanguage((i18n?.language as Language) || "en");
+    }
   }, [i18n.language]);
 
   return (
