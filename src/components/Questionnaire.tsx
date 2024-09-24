@@ -11,6 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import { DUMMY_QUESTIONS } from "../constants/DummyQuestions";
+import { SCORING_DATA } from "../constants/ScroingData";
 
 type Language = "en" | "et" | "ru";
 
@@ -18,11 +19,59 @@ const Questionnaire: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState<Language>("en");
   const [selectedOptions, setSelectedOptions] = useState<{
-    [key: string]: string;
+    [key: string]: any;
   }>({});
 
-  const handleSelect = (id: string, choice: "a" | "b") => {
+  const handleSelect = (id: string, choice: string) => {
     setSelectedOptions((prev) => ({ ...prev, [id]: choice }));
+  };
+
+  const getScores = (scoreObj: any, userAnswer: any) => {
+    const scores: any = [];
+    Object.keys(userAnswer)?.forEach((item: string) => {
+      if (typeof userAnswer[item] === "object") {
+        const innerScores = getScores(scoreObj[item], userAnswer[item]);
+        scores.push(...innerScores);
+      } else {
+        const val: any = scoreObj[item][userAnswer[item]];
+        scores.push(val);
+      }
+    });
+
+    return scores;
+  };
+
+  function sortObjectByValues<T extends Record<string, number>>(obj: T): T {
+    const sortable: [string, number][] = Object.entries(obj);
+    sortable.sort(([, a], [, b]) => b - a);
+    const sortedObj: T = Object.fromEntries(sortable) as T;
+    return sortedObj;
+  }
+
+  const calculateScore = () => {
+    const scores = getScores(SCORING_DATA.scoring, selectedOptions);
+    const userScores: any = {};
+    scores.forEach((score: { [x: string]: any }) => {
+      Object.keys(score)?.map((key) => {
+        userScores[key] = (userScores[key] || 0) + score[key];
+      });
+    });
+
+    let maxKey: any = null;
+    let maxValue = -Infinity;
+
+    for (const key in userScores) {
+      if (userScores[key] > maxValue) {
+        maxKey = key;
+        maxValue = userScores[key];
+      }
+    }
+
+    const highestScoreCareer: any = SCORING_DATA.careerPaths.find(
+      (item) => item.id === maxKey
+    );
+
+    console.log(highestScoreCareer[selectedLanguage]);
   };
 
   useEffect(() => {
@@ -47,6 +96,12 @@ const Questionnaire: React.FC = () => {
                         value={option}
                         control={<Radio />}
                         label={option}
+                        onChange={(e) =>
+                          handleSelect(
+                            item.id,
+                            (e.target as HTMLInputElement).value
+                          )
+                        }
                       />
                     )
                   )}
@@ -68,21 +123,31 @@ const Questionnaire: React.FC = () => {
                     <div className="flex justify-around mt-4 gap-2">
                       <Button
                         variant={
-                          selectedOptions[pair.id] === "a"
+                          selectedOptions?.[item.id]?.[pair.id] === "a"
                             ? "contained"
                             : "outlined"
                         }
-                        onClick={() => handleSelect(pair.id, "a")}
+                        onClick={() =>
+                          handleSelect(item.id, {
+                            ...selectedOptions[item.id],
+                            [pair.id]: "a",
+                          })
+                        }
                       >
                         {pair.a}
                       </Button>
                       <Button
                         variant={
-                          selectedOptions[pair.id] === "b"
+                          selectedOptions?.[item.id]?.[pair.id] === "b"
                             ? "contained"
                             : "outlined"
                         }
-                        onClick={() => handleSelect(pair.id, "b")}
+                        onClick={() =>
+                          handleSelect(item.id, {
+                            ...selectedOptions[item.id],
+                            [pair.id]: "b",
+                          })
+                        }
                       >
                         {pair.b}
                       </Button>
@@ -94,6 +159,11 @@ const Questionnaire: React.FC = () => {
           </div>
         ))}
       </FormControl>
+      <div className="mt-4 flex items-center justify-center">
+        <Button variant="contained" color="primary" onClick={calculateScore}>
+          Submit
+        </Button>
+      </div>
     </div>
   );
 };

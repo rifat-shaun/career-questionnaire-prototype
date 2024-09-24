@@ -91,40 +91,6 @@ export const DUMMY_QUESTIONS = [
     },
   },
   {
-    id: "career_goal",
-    type: "single-choice",
-    en: {
-      question: "What is your primary career goal?",
-      options: [
-        "Change to a new field",
-        "Advance in current field",
-        "Improve work-life balance",
-        "Increase income",
-        "Start own business",
-      ],
-    },
-    et: {
-      question: "Mis on teie peamine karjäärieesmärk?",
-      options: [
-        "Vahetan eriala",
-        "Arenen praeguses valdkonnas",
-        "Parandan töö ja eraelu tasakaalu",
-        "Suurendan sissetulekut",
-        "Alustan oma ettevõttega",
-      ],
-    },
-    ru: {
-      question: "Какова ваша основная карьерная цель?",
-      options: [
-        "Сменить сферу деятельности",
-        "Продвинуться в текущей сфере",
-        "Улучшить баланс между работой и личной жизнью",
-        "Увеличить доход",
-        "Начать свой бизнес",
-      ],
-    },
-  },
-  {
     id: "comparison_pairs",
     type: "comparison",
     en: {
