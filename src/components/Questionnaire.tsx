@@ -86,7 +86,7 @@ const Questionnaire: React.FC = () => {
                 {index + 1}.{" "}
                 {
                   SCORING_DATA.careerPaths.find((cp) => cp.id === item)?.[
-                    selectedLanguage
+                    selectedLanguage || "en"
                   ]
                 }
               </Typography>
@@ -106,13 +106,13 @@ const Questionnaire: React.FC = () => {
           <FormControl component="fieldset">
             {DUMMY_QUESTIONS.map((item) => (
               <div key={item.id}>
-                {item[selectedLanguage]?.options ? (
+                {item[selectedLanguage || "en"]?.options ? (
                   <>
                     <FormLabel component="legend">
-                      {item[selectedLanguage]?.question}
+                      {item[selectedLanguage || "en"]?.question}
                     </FormLabel>
                     <RadioGroup name="education">
-                      {(item[selectedLanguage]?.options || []).map(
+                      {(item[selectedLanguage || "en"]?.options || []).map(
                         (option: string, index: number) => (
                           <FormControlLabel
                             key={index}
@@ -133,9 +133,9 @@ const Questionnaire: React.FC = () => {
                 ) : (
                   <>
                     <FormLabel component="legend">
-                      {item[selectedLanguage]?.question}
+                      {item[selectedLanguage || "en"]?.question}
                     </FormLabel>
-                    {item[selectedLanguage]?.pairs?.map((pair) => (
+                    {item[selectedLanguage || "en"]?.pairs?.map((pair) => (
                       <Card
                         key={pair.id}
                         className="mb-4 p-4 w-full max-w-md gap-2"
