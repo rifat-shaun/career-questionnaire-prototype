@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Tabs, Tab } from "@mui/material";
+import Questionnaire from "./components/Questionnaire";
 
-function App() {
+const App: React.FC = () => {
+  const { i18n } = useTranslation();
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+    const language = newValue === 0 ? "en" : newValue === 1 ? "et" : "ru";
+    i18n.changeLanguage(language);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          textColor="primary"
+          indicatorColor="primary"
         >
-          Learn React
-        </a>
+          <Tab label="English" />
+          <Tab label="Estonian" />
+          <Tab label="Russian" />
+        </Tabs>
       </header>
+      <Questionnaire />
     </div>
   );
-}
+};
 
 export default App;

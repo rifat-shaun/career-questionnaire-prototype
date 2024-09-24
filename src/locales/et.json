@@ -1,0 +1,61 @@
+{
+  "education_question": "Milline on teie kõrgeim haridustase?",
+  "education_options": [
+    "Keskharidus või võrdväärne",
+    "Kutseharidus",
+    "Bakalaureusekraad",
+    "Magistrikraad või kõrgem"
+  ],
+  "experience_question": "Kui palju teil on töökogemust?",
+  "experience_options": [
+    "0-2 aastat",
+    "3-5 aastat",
+    "6-10 aastat",
+    "Rohkem kui 10 aastat"
+  ],
+  "current_field_question": "Milline valdkond kirjeldab kõige paremini teie praegust või viimast töökohta?",
+  "current_field_options": [
+    "Tehnoloogia ja IT",
+    "Äri ja rahandus",
+    "Tervishoid",
+    "Haridus",
+    "Loovala ja disain",
+    "Muu"
+  ],
+  "career_goal_question": "Mis on teie peamine karjäärieesmärk?",
+  "career_goal_options": [
+    "Vahetan eriala",
+    "Arenen praeguses valdkonnas",
+    "Parandan töö ja eraelu tasakaalu",
+    "Suurendan sissetulekut",
+    "Alustan oma ettevõttega"
+  ],
+  "comparison_pairs_question": "Iga paari puhul valige variant, mida eelistate või mis teid rohkem iseloomustab:",
+  "comparison_pairs": [
+    {
+      "id": "problem_solving_vs_creativity",
+      "a": "Keeruliste probleemide lahendamine",
+      "b": "Loovuse väljendamine"
+    },
+    {
+      "id": "stability_vs_change",
+      "a": "Stabiilne ja etteaimatav töökeskkond",
+      "b": "Dünaamiline ja muutuv töökeskkond"
+    },
+    {
+      "id": "teamwork_vs_independent",
+      "a": "Tihedalt meeskonnas töötamine",
+      "b": "Iseseisvalt töötamine"
+    },
+    {
+      "id": "analytical_vs_practical",
+      "a": "Andmete ja info analüüsimine",
+      "b": "Praktiliste oskuste rakendamine"
+    },
+    {
+      "id": "leading_vs_supporting",
+      "a": "Juhtimine ja otsuste tegemine",
+      "b": "Otsuste toetamine ja elluviimine"
+    }
+  ]
+}
