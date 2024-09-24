@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { DUMMY_QUESTIONS } from "../constants/DummyQuestions";
 import { SCORING_DATA } from "../constants/ScroingData";
+import ReactGA from 'react-ga4';
 
 type Language = "en" | "et" | "ru";
 
@@ -21,6 +22,18 @@ const Questionnaire: React.FC = () => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: any;
   }>({});
+
+
+const onQuestionnaireComplete = () => {
+  ReactGA.event({
+    category: 'Questionnaire',
+    action: 'Complete',
+    label: 'Questionnaire Completion',
+    value: 1
+  });
+
+  console.log('Questionnaire completed!');
+};
 
   const handleSelect = (id: string, choice: string) => {
     setSelectedOptions((prev) => ({ ...prev, [id]: choice }));
@@ -42,6 +55,7 @@ const Questionnaire: React.FC = () => {
   };
 
   const calculateScore = () => {
+    onQuestionnaireComplete();
     const scores = getScores(SCORING_DATA.scoring, selectedOptions);
     const userScores: any = {};
     scores.forEach((score: { [x: string]: any }) => {
