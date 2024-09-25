@@ -11,10 +11,14 @@ import {
   Button,
 } from "@mui/material";
 import { DUMMY_QUESTIONS } from "../constants/DummyQuestions";
-import { SCORING_DATA } from "../constants/ScroingData";
+import { MAX_DATA, SCORING_DATA } from "../constants/ScroingData";
 import ReactGA from "react-ga4";
+import Alert from "@mui/material/Alert";
 
 type Language = "en" | "et" | "ru";
+type RoleScores = {
+  [key: string]: number;
+};
 
 const Questionnaire: React.FC = () => {
   const { i18n } = useTranslation();
@@ -24,6 +28,7 @@ const Questionnaire: React.FC = () => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: any;
   }>({});
+  const [error, setError] = useState<string | null>(null);
 
   const onQuestionnaireComplete = () => {
     ReactGA.event({
@@ -52,8 +57,27 @@ const Questionnaire: React.FC = () => {
 
     return scores;
   };
+  const validateForm = () => {
+    const unansweredQuestions = DUMMY_QUESTIONS.filter(
+      (item) => !selectedOptions[item.id]
+    );
+    if (unansweredQuestions.length > 0) {
+      setError("Please answer all questions before submitting.");
+      return false;
+    }
+    setError(null);
+    return true;
+  };
+
+  const sortByValues = (obj: RoleScores): RoleScores => {
+    const sortedEntries = Object.entries(obj).sort(([, valueA], [, valueB]) => valueB - valueA);
+    
+    // Convert the sorted array of entries back to an object
+    return Object.fromEntries(sortedEntries);
+  };
 
   const calculateScore = () => {
+    if (!validateForm()) return;
     onQuestionnaireComplete();
     const scores = getScores(SCORING_DATA.scoring, selectedOptions);
     const userScores: any = {};
@@ -62,9 +86,9 @@ const Questionnaire: React.FC = () => {
         userScores[key] = (userScores[key] || 0) + score[key];
       });
     });
-
-    console.log(userScores);
-    setRecomendation(userScores);
+    const sortedData = sortByValues(userScores);
+    console.log(sortedData);
+    setRecomendation(sortedData);
     setShowReport(true);
   };
 
@@ -81,22 +105,33 @@ const Questionnaire: React.FC = () => {
           <div className="p-4 bg-slate-200">
             <Typography variant="h6">Recomended Career Paths:</Typography>
 
-            {Object.keys(recomendation)?.map((item: any, index: number) => (
-              <Typography key={item}>
+            {Object.keys(recomendation)?.map((item: string, index: number) => {
+              const key = item as keyof typeof MAX_DATA; 
+              return (
+                <Typography key={item}>
                 {index + 1}.{" "}
                 {
                   SCORING_DATA.careerPaths.find((cp) => cp.id === item)?.[
                     selectedLanguage || "en"
                   ]
-                }
+                }{" == "}
+                
+                {((recomendation[key] * 100) / MAX_DATA[key]).toFixed(2)}%
+              
               </Typography>
-            ))}
+              
+              );
+            })}
+
           </div>
 
           <Button
             variant="contained"
             color="primary"
-            onClick={() => setShowReport(false)}
+            onClick={() => {
+              setShowReport(false)
+              window.location.reload(); 
+            }}
           >
             Back
           </Button>
@@ -105,36 +140,32 @@ const Questionnaire: React.FC = () => {
         <>
           <FormControl component="fieldset">
             {DUMMY_QUESTIONS.map((item) => (
-              <div key={item.id}>
+              <div key={item.id} className="mb-4">
+                <FormLabel component="legend">
+                  {item[selectedLanguage || "en"]?.question}{" "}
+                  <span style={{ color: "red" }}>*</span>{" "}
+                </FormLabel>
                 {item[selectedLanguage || "en"]?.options ? (
-                  <>
-                    <FormLabel component="legend">
-                      {item[selectedLanguage || "en"]?.question}
-                    </FormLabel>
-                    <RadioGroup name="education">
-                      {(item[selectedLanguage || "en"]?.options || []).map(
-                        (option: string, index: number) => (
-                          <FormControlLabel
-                            key={index}
-                            value={option}
-                            control={<Radio />}
-                            label={option}
-                            onChange={(e) =>
-                              handleSelect(
-                                item.id,
-                                (e.target as HTMLInputElement).value
-                              )
-                            }
-                          />
-                        )
-                      )}
-                    </RadioGroup>
-                  </>
+                  <RadioGroup name={item.id}>
+                    {(item[selectedLanguage || "en"]?.options || []).map(
+                      (option: string, index: number) => (
+                        <FormControlLabel
+                          key={index}
+                          value={option}
+                          control={<Radio />}
+                          label={option}
+                          onChange={(e) =>
+                            handleSelect(
+                              item.id,
+                              (e.target as HTMLInputElement).value
+                            )
+                          }
+                        />
+                      )
+                    )}
+                  </RadioGroup>
                 ) : (
                   <>
-                    <FormLabel component="legend">
-                      {item[selectedLanguage || "en"]?.question}
-                    </FormLabel>
                     {item[selectedLanguage || "en"]?.pairs?.map((pair) => (
                       <Card
                         key={pair.id}
@@ -182,6 +213,7 @@ const Questionnaire: React.FC = () => {
               </div>
             ))}
           </FormControl>
+          {error && <Alert severity="error">{error}</Alert>}
           <div className="mt-4 flex items-center justify-center">
             <Button
               variant="contained"
